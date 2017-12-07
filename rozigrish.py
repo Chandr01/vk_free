@@ -36,24 +36,37 @@ def get_data(urls, ids, token):
         try:
             f_data = requests.get(i)
             gr_ind = ids[count].split('_')[0].replace('-', '')
-            gr_members = 'https://api.vk.com/method/groups.getMembers?group_id={}&fields=city&v=5.69&access_token={}'.format(gr_ind, token)
-            sleep(0.4)
+
+            gr_members = 'https://api.vk.com/method/groups.getMembers?group_id={}&fields=city&v=5.69&access_token={}'.format(
+                gr_ind, token)
+            sleep(0.1)
             gr_link = requests.get(gr_members)
             gr_count = gr_link.json()['response']['count']
-            city = gr_link.json()['response']['items'][3]['city']['title']
+            # print(gr_count)
+            try:
+                city = gr_link.json()['response']['items'][3]['city']['title']
+            except:
+                city = 'Не указан'
+            # print(city)
+            sleep(0.1)
             if int(gr_count) >= 100:
                 link = 'http://vk.com/wall{}'.format(ids[count])
                 text = f_data.json()['response'][0]['text'].strip().replace('\n', ' ')
                 Likes = f_data.json()['response'][0]['likes']['count']
                 Reposts = f_data.json()['response'][0]['reposts']['count']
-                date = datetime.datetime.fromtimestamp(f_data.json()['response'][0]['date']).strftime('%Y-%m-%d %H:%M:%S')
+                date = datetime.datetime.fromtimestamp(f_data.json()['response'][0]['date']).strftime(
+                    '%Y-%m-%d %H:%M:%S')
                 data[count] = {'Ссылка': link, 'Дата публикации': date, 'В группе': gr_count, 'Лайки': Likes,
-                    'Репосты': Reposts, 'Текст поста': text, 'Город': city}
-                count += 1
-                sleep(0.4)
+                               'Репосты': Reposts, 'Текст поста': text, 'Город': city}
 
+
+            else:
+                print(gr_count, 'members', i)
+            count += 1
+            sleep(0.2)
         except:
             print('Проскачили {}'.format(i))
+            count += 1
 
     return data
 
